@@ -62,76 +62,56 @@ class Day1_1
     {
         using (StreamReader reader = new StreamReader("input_2.txt"))
         {
-            List<string> inputList = new List<string>();
-            while (!reader.EndOfStream)
-            {
-                inputList.Add(reader.ReadLine());
-            }
-
             Dictionary<string, int> ConversionDict = new Dictionary<string, int>()
             {
-                ["one"] = 49,
-                ["two"] = 50,
-                ["three"] = 51,
-                ["four"] = 52,
-                ["five"] = 53,
-                ["six"] = 54,
-                ["seven"] = 55,
-                ["eight"] = 56,
-                ["nine"] = 57
+                ["one"] = 1,
+                ["two"] = 2,
+                ["three"] = 3,
+                ["four"] = 4,
+                ["five"] = 5,
+                ["six"] = 6,
+                ["seven"] = 7,
+                ["eight"] = 8,
+                ["nine"] = 9
             };
 
+            string[] lines = reader.ReadToEnd().Split("\r\n");
+            int sum = 0;
 
-            long solutionSum = 0;
-            foreach (var line in inputList)
+            for (var lineIndex = 0; lineIndex < lines.Length; lineIndex++)
             {
-                char firstChar = '-';
-                char lastChar = '-';
-
+                string line = lines[lineIndex];
+                string tempLine = "";
                 string lineSolution = "";
-                string tempLineBuffer = "";
+                List<string> lineSolutions = new List<string>();
 
-                foreach (var character in line)
+                for (var characterIndex = 0; characterIndex < line.Length; characterIndex++)
                 {
-                    tempLineBuffer += character;
-                    var tempCharacter = character;
+                    string character = line[characterIndex].ToString();
+                    tempLine += character;
+
+
+                    if (int.TryParse(character, out int worked))
+                    {
+                        lineSolutions.Add(character);
+                        tempLine = "";
+                    }
 
                     foreach (var key in ConversionDict.Keys)
                     {
-                        if (tempLineBuffer.Contains(key))
+                        if (tempLine.Contains(key))
                         {
-                            tempCharacter = (char)ConversionDict[key];
-                        }
-                    }
-
-                    if ((int)tempCharacter >= 49 &&
-                    (int)tempCharacter <= 57)
-                    {
-                        tempLineBuffer = "";
-
-                        if (firstChar == '-')
-                        {
-                            firstChar = tempCharacter;
-                        }
-                        else
-                        {
-                            lastChar = tempCharacter;
+                            lineSolutions.Add((ConversionDict[key]).ToString());
+                            tempLine = "";
+                            break;
                         }
                     }
                 }
 
-                if (lastChar == '-')
-                {
-                    lastChar = firstChar;
-                }
-
-                lineSolution = firstChar.ToString() + lastChar.ToString();
-                solutionSum += int.Parse(lineSolution);
-
-                Console.WriteLine(lineSolution);
+                lineSolution = lineSolutions[0] + lineSolutions[lineSolutions.Count - 1];
+                sum += int.Parse(lineSolution);
             }
-
-            Console.WriteLine(solutionSum);
+            Console.WriteLine(sum); //54978 higher
         }
     }
 }
