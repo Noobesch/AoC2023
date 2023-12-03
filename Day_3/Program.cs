@@ -29,8 +29,9 @@ public class Gear
         secondGearComp = other.secondGearComp;
     }
     public int position;
-    public int firstGearComp;
-    public int secondGearComp;
+    public long firstGearComp = long.MinValue;
+    public EngineNumber firstEngine = null;
+    public long secondGearComp = long.MinValue;
 }
 
 public class Day3
@@ -143,7 +144,7 @@ public class Day3
             input = input.Replace("\r\n", "");
 
             List<EngineNumber> numberList = new List<EngineNumber>();
-            List<int> possibleGearList = new List<int>();
+            List<Gear> possibleGearList = new List<Gear>();
 
             string currentNumString = "";
             EngineNumber engineNumber = null;
@@ -177,19 +178,11 @@ public class Day3
 
                     if (character == '*')
                     {
-                        possibleGearList.Add(charIndex);
+                        Gear gear = new Gear();
+                        gear.position = charIndex;
+                        possibleGearList.Add(gear);
                     }
                 }
-            }
-
-            // foreach(var number in numberList)
-            // {
-            //     Console.WriteLine($"Found {number.containedNumber} from {number.startIndex} till {number.endIndex}");
-            // }
-
-            foreach (var symbol in possibleGearList)
-            {
-                Console.WriteLine($"Found a gear at {symbol}");
             }
 
             int[] neighbourArray = new int[]
@@ -199,35 +192,43 @@ public class Day3
                 lineLength -1, lineLength, lineLength +1
                 };
 
-            int solution2 = 0;
+            long solution2 = 0;
 
-            // foreach (var number in numberList)
-            // {
-            //     int start = number.startIndex;
-            //     int end = number.endIndex;
-            //     bool found = false;
+            //For every gear
+            foreach (var gear in possibleGearList)
+            {
+                //Find every neighbour
+                foreach (var neighbour in neighbourArray)
+                {
+                    int lookedAtPos = gear.position + neighbour;
+                    EngineNumber foundEngine = numberList.Find(x => x.startIndex <= lookedAtPos && x.endIndex >= lookedAtPos);
 
+                    if(foundEngine == null)
+                    {
+                        continue;
+                    }
 
-            //     foreach (int symbol in geareList)
-            //     {
-            //         if (found)
-            //         {
-            //             break;
-            //         }
-            //         foreach (int neighbour in neighbourArray)
-            //         {
-            //             if ((symbol + neighbour) >= start &&
-            //             (symbol + neighbour) <= end)
-            //             {
-            //                 solution2 += number.containedNumber;
-            //                 found = true;
-            //                 break;
-            //             }
-            //         }
-            //     }
-            // }
+                    if (gear.firstGearComp == long.MinValue)
+                    {
+                        gear.firstGearComp = foundEngine.containedNumber;
+                        gear.firstEngine = foundEngine;
+                    }
+                    else if (gear.firstEngine != foundEngine)
+                    {
+                        gear.secondGearComp = foundEngine.containedNumber;
+                    }
+                }
+            }
 
-            // Console.WriteLine($"Solution of 2 is {solution2}");
+            foreach (var gear in possibleGearList)
+            {
+                if (gear.firstGearComp != long.MinValue && gear.secondGearComp != long.MinValue)
+                {
+                    solution2 += gear.firstGearComp * gear.secondGearComp;
+                }
+            }
+
+            Console.WriteLine($"Solution of 2 is {solution2}");
         }
     }
 }
