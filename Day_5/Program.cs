@@ -121,7 +121,7 @@ public class Day5
                 departments[i] = department;
             }
 
-            HashSet<long> seeds = new HashSet<long>();
+            List<long> seeds = new List<long>();
 
             var stringSeed = departments[0].Split(" ");
 
@@ -141,9 +141,10 @@ public class Day5
                     seeds.Add(numberToAdd);
                 }
 
-                Console.WriteLine("Did an input");
+                Console.WriteLine($"Did an input for {seed}");
 
                 seedIndex++;
+
             }
 
             List<List<(long destination, long source, long length)>> completeList = new List<List<(long source, long destination, long length)>>();
@@ -176,10 +177,10 @@ public class Day5
 
             Console.WriteLine($"There are {seeds.Count} seeds");
 
-            long seedNumber = 0;
-            foreach (var seed in seeds)
+            for (var seedIndex = 0; seedIndex < seeds.Count; seedIndex++)
             {
-                long tempSeed = seed;
+                var seed = seeds[seedIndex];
+
                 for (var completeIndex = 0; completeIndex < completeList.Count; completeIndex++)
                 {
                     var department = completeList[completeIndex];
@@ -190,21 +191,21 @@ public class Day5
                         if (seed >= valueTuple.source && seed < (valueTuple.source + valueTuple.length))
                         {
                             var difference = valueTuple.destination - valueTuple.source;
-                            tempSeed += difference;
+                            seed += difference;
                             break;
                         }
                     }
                 }
-                if (tempSeed < smallestLocation)
+                if (seed < smallestLocation)
                 {
-                    smallestLocation = tempSeed;
+                    smallestLocation = seed;
                 }
 
-                if (seedNumber % 10000 == 0)
+                if (seedIndex % 10000 == 0)
                 {
-                    Console.WriteLine($"Index is {seedNumber}.");
+                    Console.WriteLine($"Index is {seedIndex}.");
+
                 }
-                seedNumber++;
             }
 
             Console.WriteLine(smallestLocation);
