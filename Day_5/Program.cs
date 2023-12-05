@@ -1,4 +1,5 @@
-﻿using System.Security.AccessControl;
+﻿using System.Diagnostics;
+using System.Security.AccessControl;
 
 public class Day5
 {
@@ -102,6 +103,9 @@ public class Day5
 
     static void Part2()
     {
+        Stopwatch sw = new Stopwatch();
+
+        sw.Start();
         string path = "Input_1.txt";
         // path = "../../../Input_1.txt";
         using (StreamReader reader = new StreamReader(path))
@@ -127,24 +131,12 @@ public class Day5
 
             for (var seedIndex = 0; seedIndex < stringSeed.Length; seedIndex++)
             {
-                var seed = stringSeed[seedIndex];
-
-                if (seed == "")
+                if (stringSeed[seedIndex] == "")
                 {
                     continue;
                 }
-                var start = long.Parse(stringSeed[seedIndex]);
-                var range = long.Parse(stringSeed[seedIndex + 1]);
 
-                for (var numberToAdd = start; numberToAdd < (start + range); numberToAdd++)
-                {
-                    seeds.Add(numberToAdd);
-                }
-
-                Console.WriteLine($"Did an input for {seed}");
-
-                seedIndex++;
-
+                seeds.Add(long.Parse(stringSeed[seedIndex]));
             }
 
             List<List<(long destination, long source, long length)>> completeList = new List<List<(long source, long destination, long length)>>();
@@ -173,42 +165,44 @@ public class Day5
                 completeList.Add(departmentValues);
             }
 
-            long smallestLocation = long.MaxValue;
+            long possibleLocation = 0;
+            bool locationFound = false;
 
-            Console.WriteLine($"There are {seeds.Count} seeds");
-
-            for (var seedIndex = 0; seedIndex < seeds.Count; seedIndex++)
+            while (!locationFound)
             {
-                var seed = seeds[seedIndex];
-
-                for (var completeIndex = 0; completeIndex < completeList.Count; completeIndex++)
+                long localPossibleLocation = possibleLocation;
+                for (var completeIndex = completeList.Count - 1; completeIndex >= 0; completeIndex--)
                 {
                     var department = completeList[completeIndex];
 
                     for (var departmentIndex = 0; departmentIndex < department.Count; departmentIndex++)
                     {
                         var valueTuple = department[departmentIndex];
-                        if (seed >= valueTuple.source && seed < (valueTuple.source + valueTuple.length))
+
+                        if (localPossibleLocation >= valueTuple.destination && localPossibleLocation < (valueTuple.destination + valueTuple.length))
                         {
-                            var difference = valueTuple.destination - valueTuple.source;
-                            seed += difference;
+                            var difference = valueTuple.source - valueTuple.destination;
+                            localPossibleLocation += difference;
                             break;
                         }
                     }
                 }
-                if (seed < smallestLocation)
+
+                for (var seedIndex = 0; seedIndex < seeds.Count; seedIndex += 2)
                 {
-                    smallestLocation = seed;
+                    var start = seeds[seedIndex];
+                    var end = start + seeds[seedIndex + 1];
+
+                    if (localPossibleLocation >= start && localPossibleLocation <= end)
+                    {
+                        locationFound = true;
+                        Console.WriteLine($"Found location at {possibleLocation} in {sw.ElapsedMilliseconds} ms");
+                        break;
+                    }
                 }
 
-                if (seedIndex % 10000 == 0)
-                {
-                    Console.WriteLine($"Index is {seedIndex}.");
-
-                }
+                possibleLocation++;
             }
-
-            Console.WriteLine(smallestLocation);
         }
     }
 }
