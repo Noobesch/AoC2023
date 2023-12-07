@@ -8,7 +8,7 @@ public class Day7
     static void Main()
     {
         string path = "Input_1.txt";
-        path = "../../../Input_1.txt";
+        // path = "../../../Input_1.txt";
         Part1(path);
     }
 
@@ -31,7 +31,7 @@ public class Day7
                 tupleList.Add((splitLine[0], int.Parse(splitLine[1])));
             }
 
-            Console.WriteLine("a");
+            tupleList.Reverse();
 
             List<(string hand, int bid)> sortedList = new List<(string hand, int bid)>();
 
@@ -49,9 +49,6 @@ public class Day7
             {
                 var tuple = tupleList[entryIndex];
 
-
-
-
                 var hand = String.Concat(tuple.hand.OrderBy(c => c));
 
                 int i = 0;
@@ -61,42 +58,36 @@ public class Day7
                     int count = hand.Split(hand[i]).Length - 1;
 
                     appearanceList.Add(count);
-                    i+= count;
+                    i += count;
                 }
 
                 appearanceList.Sort();
+                appearanceList.Reverse();
 
 
-                if (hand[0] == hand[1] &&
-                hand[0] == hand[2] &&
-                hand[0] == hand[3] &&
-                hand[0] == hand[4])
+                if (appearanceList[0] == 5)
                 {
                     fiveHand = InsertIntoList(fiveHand, tuple);
                 }
-                else if (hand[0] == hand[1] &&
-                hand[0] == hand[2] &&
-                hand[0] == hand[3])
+                else if (appearanceList[0] == 4)
                 {
                     fourHand = InsertIntoList(fourHand, tuple);
                 }
-                else if (hand[0] == hand[1] &&
-                hand[0] == hand[2] &&
-                hand[3] == hand[4])
+                else if (appearanceList[0] == 3 &&
+                appearanceList[1] == 2)
                 {
                     fHHand = InsertIntoList(fHHand, tuple);
                 }
-                else if (hand[0] == hand[1] &&
-                hand[0] == hand[2])
+                else if (appearanceList[0] == 3)
                 {
                     threeHand = InsertIntoList(threeHand, tuple);
                 }
-                else if (hand[0] == hand[1] &&
-                hand[2] == hand[3])
+                else if (appearanceList[0] == 2 &&
+                appearanceList[1] == 2)
                 {
                     tPHand = InsertIntoList(tPHand, tuple);
                 }
-                else if (hand[0] == hand[1])
+                else if (appearanceList[0] == 2)
                 {
                     oPHand = InsertIntoList(oPHand, tuple);
                 }
@@ -106,9 +97,22 @@ public class Day7
                 }
             }
 
+            sortedList.AddRange(hcHand);
+            sortedList.AddRange(oPHand);
+            sortedList.AddRange(tPHand);
+            sortedList.AddRange(threeHand);
+            sortedList.AddRange(fHHand);
+            sortedList.AddRange(fourHand);
             sortedList.AddRange(fiveHand);
 
-            Console.WriteLine(";");
+            int solution1 = 0;
+
+            for(var i = 0; i < sortedList.Count; i++)
+            {
+                solution1 += (i + 1) * sortedList[i].bid;
+            }
+
+            Console.WriteLine($"Solution 1 is {solution1}");
         }
     }
 
@@ -117,6 +121,7 @@ public class Day7
         if (ListToInsert.Count == 0)
         {
             ListToInsert.Add(tuple);
+            return ListToInsert;
         }
         else
         {
@@ -129,18 +134,19 @@ public class Day7
                     var listRanking = Array.IndexOf(strengthArray, entryHand[handIndex]);
                     var newRanking = Array.IndexOf(strengthArray, tuple.hand[handIndex]);
 
-                    if (listRanking == newRanking)
+                    if (listRanking < newRanking)
                     {
-                        continue;
+                        ListToInsert.Insert(tupleIndex + 1, tuple);
+                        return ListToInsert;
                     }
-                    else if (newRanking < listRanking)
+                    else if (listRanking > newRanking)
                     {
-                        ListToInsert.Insert(tupleIndex, tuple);
-                        return (ListToInsert);
+                        break;
                     }
                 }
             }
         }
-        throw new Exception();
+        ListToInsert.Insert(0,tuple);
+        return ListToInsert;
     }
 }
