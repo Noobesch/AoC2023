@@ -8,7 +8,7 @@ public class Day7
     static void Main()
     {
         string path = "Input_1.txt";
-        // path = "../../../Input_1.txt";
+        path = "../../../Input_1.txt";
         Part1(path);
     }
 
@@ -107,7 +107,7 @@ public class Day7
 
             int solution1 = 0;
 
-            for(var i = 0; i < sortedList.Count; i++)
+            for (var i = 0; i < sortedList.Count; i++)
             {
                 solution1 += (i + 1) * sortedList[i].bid;
             }
@@ -118,6 +118,8 @@ public class Day7
 
     static List<(string hand, int bid)> InsertIntoList(List<(string hand, int bid)> ListToInsert, (string hand, int bid) tuple)
     {
+        int smallestInsert = 0;
+
         if (ListToInsert.Count == 0)
         {
             ListToInsert.Add(tuple);
@@ -136,8 +138,9 @@ public class Day7
 
                     if (listRanking < newRanking)
                     {
-                        ListToInsert.Insert(tupleIndex + 1, tuple);
-                        return ListToInsert;
+                        smallestInsert++;
+                        break;
+
                     }
                     else if (listRanking > newRanking)
                     {
@@ -146,7 +149,7 @@ public class Day7
                 }
             }
         }
-        ListToInsert.Insert(0,tuple);
+        ListToInsert.Insert(smallestInsert, tuple);
         return ListToInsert;
     }
 }
