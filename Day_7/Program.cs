@@ -3,6 +3,8 @@ using System.Security.AccessControl;
 
 public class Day7
 {
+    static char[] strengthArray = new char[] { '2', '3', '4', '5', '6', '7', '8', '9', 'T', 'J', 'Q', 'K', 'A' };
+
     static void Main()
     {
         string path = "Input_1.txt";
@@ -14,7 +16,6 @@ public class Day7
     {
         using (StreamReader reader = new StreamReader(path))
         {
-            char[] strengthArray = new char[] { '2', '3', '4', '5', '6', '7', '8', '9', 'T', 'J', 'Q', 'K', 'A' };
 
             List<string> hands = new List<string>();
             List<int> bids = new List<int>();
@@ -37,7 +38,7 @@ public class Day7
             List<(string hand, int bid)> fiveHand = new List<(string hand, int bid)>();
             List<(string hand, int bid)> fourHand = new List<(string hand, int bid)>();
             List<(string hand, int bid)> fHHand = new List<(string hand, int bid)>();
-            List<(string hand, int bid)> ThreeHand = new List<(string hand, int bid)>();
+            List<(string hand, int bid)> threeHand = new List<(string hand, int bid)>();
             List<(string hand, int bid)> tPHand = new List<(string hand, int bid)>();
             List<(string hand, int bid)> oPHand = new List<(string hand, int bid)>();
             List<(string hand, int bid)> hcHand = new List<(string hand, int bid)>();
@@ -47,56 +48,99 @@ public class Day7
             for (var entryIndex = 0; entryIndex < tupleList.Count; entryIndex++)
             {
                 var tuple = tupleList[entryIndex];
-                
-                if(tupleList.Count == 0)
+
+
+
+
+                var hand = String.Concat(tuple.hand.OrderBy(c => c));
+
+                int i = 0;
+                List<int> appearanceList = new List<int>();
+                while (i < hand.Length)
                 {
-                    tupleList.Add(tuple);
-                    continue;
+                    int count = hand.Split(hand[i]).Length - 1;
+
+                    appearanceList.Add(count);
+                    i+= count;
                 }
 
-               var hand =  String.Concat(tuple.hand.OrderBy(c => c));
+                appearanceList.Sort();
 
-                if( hand[0] == hand[1] && hand[0] == hand[2] &&
+
+                if (hand[0] == hand[1] &&
+                hand[0] == hand[2] &&
                 hand[0] == hand[3] &&
                 hand[0] == hand[4])
                 {
-                    if(fiveHand.Count == 0)
-                    {
-                        fiveHand.Add(tuple);
-                    }
-                    else
-                    {
-                        bool handFound = false;
-                        for(var tupleIndex = 0; tupleIndex < fiveHand.Count; tupleIndex++)
-                        {
-                            var entryHand = fiveHand[tupleIndex].hand;
-
-                            for(var handIndex = 0; handIndex < entryHand.Length; handIndex++)
-                            {
-                                var listRanking = Array.IndexOf(strengthArray, entryHand[handIndex]);
-                                var newRanking = Array.IndexOf(strengthArray, tuple.hand[handIndex]);
-
-                                if(listRanking == newRanking)
-                                {
-                                    continue;
-                                }
-                                else if(newRanking < listRanking)
-                                {
-                                    fiveHand.Insert(tupleIndex, tuple);
-                                    handFound = true;
-                                    break;
-                                }
-                            }
-                            if(handFound)
-                            {
-                                break;
-                            }
-                        }
-                    }
+                    fiveHand = InsertIntoList(fiveHand, tuple);
+                }
+                else if (hand[0] == hand[1] &&
+                hand[0] == hand[2] &&
+                hand[0] == hand[3])
+                {
+                    fourHand = InsertIntoList(fourHand, tuple);
+                }
+                else if (hand[0] == hand[1] &&
+                hand[0] == hand[2] &&
+                hand[3] == hand[4])
+                {
+                    fHHand = InsertIntoList(fHHand, tuple);
+                }
+                else if (hand[0] == hand[1] &&
+                hand[0] == hand[2])
+                {
+                    threeHand = InsertIntoList(threeHand, tuple);
+                }
+                else if (hand[0] == hand[1] &&
+                hand[2] == hand[3])
+                {
+                    tPHand = InsertIntoList(tPHand, tuple);
+                }
+                else if (hand[0] == hand[1])
+                {
+                    oPHand = InsertIntoList(oPHand, tuple);
+                }
+                else
+                {
+                    hcHand = InsertIntoList(hcHand, tuple);
                 }
             }
 
+            sortedList.AddRange(fiveHand);
+
             Console.WriteLine(";");
         }
+    }
+
+    static List<(string hand, int bid)> InsertIntoList(List<(string hand, int bid)> ListToInsert, (string hand, int bid) tuple)
+    {
+        if (ListToInsert.Count == 0)
+        {
+            ListToInsert.Add(tuple);
+        }
+        else
+        {
+            for (var tupleIndex = 0; tupleIndex < ListToInsert.Count; tupleIndex++)
+            {
+                var entryHand = ListToInsert[tupleIndex].hand;
+
+                for (var handIndex = 0; handIndex < entryHand.Length; handIndex++)
+                {
+                    var listRanking = Array.IndexOf(strengthArray, entryHand[handIndex]);
+                    var newRanking = Array.IndexOf(strengthArray, tuple.hand[handIndex]);
+
+                    if (listRanking == newRanking)
+                    {
+                        continue;
+                    }
+                    else if (newRanking < listRanking)
+                    {
+                        ListToInsert.Insert(tupleIndex, tuple);
+                        return (ListToInsert);
+                    }
+                }
+            }
+        }
+        throw new Exception();
     }
 }
