@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Security.AccessControl;
 
-public class Day5
+public class Day6
 {
     static void Main()
     {
