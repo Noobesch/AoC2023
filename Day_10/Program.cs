@@ -1,11 +1,9 @@
 ﻿public class Day10
 {
-
-
     static void Main()
     {
         string path = "Input_1.txt";
-        path = "../../../Input_1.txt";
+        // path = "../../../Input_1.txt";
         Part1(path);
         // Part2(path);
     }
@@ -41,76 +39,107 @@
                 rowCounter++;
             }
 
-            Console.WriteLine($"Done, S is at {startPosition.row}, {startPosition.column}");
+            int rowLength = inputList.Count;
+            int columnLength = inputList[0].Length;
 
-            int stepCounter = 0;
-
-            (int row, int column)[] cardinalDirections = { (-1, 0), (0, -1), (0, 1), (1, 0) };
-
-            for (var directionIndex = 0; directionIndex < cardinalDirections.Length; directionIndex++)
+            for (var runThroughs = 0; runThroughs < 5; runThroughs++)
             {
-                var nextStep = cardinalDirections[directionIndex];
-                (int row, int column) lastPosition = (startPosition.row, startPosition.column);
-                (int row, int column) currentPosition = (startPosition.row + nextStep.row, startPosition.column + nextStep.column);
-
-                while (true)
+                for (var rowIndex = 0; rowIndex < inputList.Count; rowIndex++)
                 {
-                    var symbol = inputList[currentPosition.row][currentPosition.column];
-
-                    if (symbol == 'S')
+                    for (var columnIndex = 0; columnIndex < inputList[0].Length; columnIndex++)
                     {
-                        Console.WriteLine("Found the loop");
-                        break;
-                    }
+                        char symbol = inputList[rowIndex][columnIndex];
 
-                    var possibleNextSteps = mappingDict[symbol];
-                    bool backPossible = false;
-                    bool forwardPossible = false;
-
-                    foreach (var step in possibleNextSteps)
-                    {
-                        (int row, int column) tempNext = (currentPosition.row + step.row, currentPosition.column + step.column);
-
-
-
-                        if (tempNext.row < 0 || tempNext.row >= inputList.Count ||
-                        tempNext.column < 0 || tempNext.column >= inputList[0].Length)
+                        if (!mappingDict.Keys.Contains(symbol))
                         {
-                            break;
+                            continue;
                         }
 
-                        var tempNextSymbol = inputList[tempNext.row][tempNext.column];
-                        var tempNextSteps = mappingDict[tempNextSymbol];
-
-                        if (tempNext.row != lastPosition.row || tempNext.column != lastPosition.column)
+                        foreach (var step in mappingDict[symbol])
                         {
-                            forwardPossible = true;
+                            (int row, int column) nextCoords = (rowIndex + step.row, columnIndex + step.column);
 
-                            (int row, int column) backStep = (-step.row, -step.column);
-                            if (tempNextSteps.Contains(backStep))
+                            if (nextCoords.row < 0 || nextCoords.row >= rowLength ||
+                            nextCoords.column < 0 || nextCoords.column >= columnLength)
                             {
-                                backPossible = true;
+                                inputList[rowIndex][columnIndex] = '.';
+                                continue;
                             }
 
-                            nextStep = tempNext;
-                        }
-                    }
 
-                    if (backPossible && forwardPossible)
-                    {
-                        lastPosition = currentPosition;
-                        currentPosition = nextStep;
-                        stepCounter++;
-                    }
-                    else
-                    {
-                        Console.WriteLine("This start direction was not possible");
-                        break;
+                            char nextSymbol = inputList[rowIndex + step.row][columnIndex + step.column];
+
+                            if (nextSymbol == '.')
+                            {
+                                inputList[rowIndex][columnIndex] = '.';
+                                continue;
+                            }
+                            else if (nextSymbol == 'S')
+                            {
+                                continue;
+                            }
+
+                            (int row, int column)[] steps = mappingDict[nextSymbol];
+
+                            if (!steps.Contains((-step.row, -step.column)))
+                            {
+                                inputList[rowIndex][columnIndex] = '.';
+                            }
+                        }
                     }
                 }
             }
 
 
+            int loopLength = 0;
+
+            for (var lineIndex = 0; lineIndex < inputList.Count; lineIndex++)
+            {
+                var line = inputList[lineIndex];
+
+                for (var charIndex = 0; charIndex < line.Length; charIndex++)
+                {
+                    char character = line[charIndex];
+                    loopLength++;
+                    switch (character)
+                    {
+                        case '|':
+                            line[charIndex] = '|';
+                            break;
+                        case '-':
+                            line[charIndex] = '─';
+                            break;
+                        case 'L':
+                            line[charIndex] = '└';
+                            break;
+                        case 'J':
+                            line[charIndex] = '┘';
+                            break;
+                        case '7':
+                            line[charIndex] = '┐';
+                            break;
+                        case 'F':
+                            line[charIndex] = '┌';
+                            break;
+                        default:
+                            loopLength--;
+                            break;
+                    }
+                }
+
+                inputList[lineIndex] = line;
+            }
+
+            for (var lineIndex = 0; lineIndex < inputList.Count; lineIndex++)
+            {
+                for (var charIndex = 0; charIndex < inputList[0].Length; charIndex++)
+                {
+                    Console.Write(inputList[lineIndex][charIndex]);
+                }
+                Console.WriteLine();
+            }
+
+            Console.WriteLine($"Loop length is {(loopLength + 1) / 2}");
         }
     }
 }
