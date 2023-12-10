@@ -169,7 +169,7 @@ public class Day7
                     i += count;
                 }
 
-                appearanceList.Sort();
+                appearanceList.Sort((a, b) => a.count.CompareTo(b.count));
                 appearanceList.Reverse();
 
                 int jCount = hand.Split('J').Length - 1;
@@ -180,12 +180,12 @@ public class Day7
                     for (var j = 0; j < appearanceList.Count; j++)
                     {
                         var appTuple = appearanceList[j];
-                        if (appTuple.character == 'J')
+                        if (appTuple.character == 'J' && appTuple.count != 5)
                         {
                             appearanceList[j] = ('J', 0);
                             continue;
                         }
-                        else if (!highestFound)
+                        else if (!highestFound && appTuple.character != 'J')
                         {
                             appearanceList[j] = (appTuple.character, appTuple.count + jCount);
                             highestFound = true;
@@ -205,7 +205,7 @@ public class Day7
                     fourHand = InsertIntoList(fourHand, tuple);
                 }
                 else if (appearanceList[0].count == 3 &&
-                appearanceList[1].character == 2)
+                appearanceList[1].count == 2)
                 {
                     fHHand = InsertIntoList(fHHand, tuple);
                 }
