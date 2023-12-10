@@ -1,4 +1,14 @@
-﻿public class Day10
+﻿using System.Runtime.CompilerServices;
+
+public enum Last
+{
+    Up,
+    Down,
+    Straight,
+    None
+}
+
+public class Day10
 {
     static void Main()
     {
@@ -233,26 +243,31 @@
             for (var lineIndex = 0; lineIndex < inputList.Count; lineIndex++)
             {
                 var line = inputList[lineIndex];
-                bool firstCharFound = false;
+                int crossedLinesCounter = 0;
+
+                Last lastPipeDirection = Last.Straight;
+
+                if (lineIndex == 8)
+                {
+
+                }
 
                 for (var charIndex = 0; charIndex < line.Length; charIndex++)
                 {
                     char character = line[charIndex];
-                    if (!firstCharFound && character == '.')
+
+                    if (character == '.' && (crossedLinesCounter % 2) == 0)
                     {
                         line[charIndex] = ' ';
                         continue;
-                    }
-
-                    if (character != '.' && character != ' ')
-                    {
-                        firstCharFound = true;
                     }
 
                     switch (character)
                     {
                         case '|':
                             line[charIndex] = '|';
+                            lastPipeDirection = Last.Straight;
+                            crossedLinesCounter += 1;
                             break;
                         case '-':
                             line[charIndex] = '─';
@@ -272,88 +287,67 @@
                         default:
                             break;
                     }
+
+                    character = line[charIndex];
+
+                    if (character == '┐' || character == '└')
+                    {
+                        if (lastPipeDirection == Last.Down)
+                        {
+                            crossedLinesCounter += 1;
+                            lastPipeDirection = Last.None;
+                        }
+                        else if (lastPipeDirection == Last.Up)
+                        {
+                            lastPipeDirection = Last.None;
+                        }
+                        else
+                        {
+                            lastPipeDirection = Last.Down;
+                        }
+                    }
+                    else if (character == '┌' || character == '┘')
+                    {
+                        if (lastPipeDirection == Last.Up)
+                        {
+                            crossedLinesCounter += 1;
+                            lastPipeDirection = Last.None;
+                        }
+                        else if (lastPipeDirection == Last.Down)
+                        {
+                            lastPipeDirection = Last.None;
+                        }
+                        else
+                        {
+                            lastPipeDirection = Last.Up;
+                        }
+                    }
+
+                    int hallo = 1;
                 }
                 inputList[lineIndex] = line;
             }
 
-            for (var lineIndex = 0; lineIndex < inputList.Count; lineIndex++)
-            {
-                var line = inputList[lineIndex];
-                bool firstCharFound = false;
-
-                for (var charIndex = 0; charIndex < line.Length; charIndex++)
-                {
-                    char character = line[charIndex];
-                    if (!firstCharFound && character == '.')
-                    {
-                        line[charIndex] = ' ';
-                        continue;
-                    }
-
-                    if (character != '.' && character != ' ')
-                    {
-                        firstCharFound = true;
-                    }
-                }
-                inputList[lineIndex] = line;
-            }
-
-            for (var lineIndex = 0; lineIndex < inputList.Count; lineIndex++)
-            {
-                var line = inputList[lineIndex];
-                bool firstCharFound = false;
-
-                for (var charIndex = line.Length - 1; charIndex >= 0; charIndex--)
-                {
-                    char character = line[charIndex];
-                    if (!firstCharFound && character == '.')
-                    {
-                        line[charIndex] = ' ';
-                        continue;
-                    }
-
-                    if (character != '.' && character != ' ')
-                    {
-                        firstCharFound = true;
-                    }
-                }
-                inputList[lineIndex] = line;
-            }
-
-
-            for (var charIndex = inputList[0].Length - 1; charIndex >= 0; charIndex--)
-            {
-                bool firstCharFound = false;
-
-                for (var lineIndex = 0; lineIndex < inputList.Count; lineIndex++)
-                {
-
-                    char character = inputList[lineIndex][charIndex];
-                    if (!firstCharFound && character == '.')
-                    {
-                        inputList[lineIndex][charIndex] = ' ';
-                        continue;
-                    }
-
-                    if (character != '.' && character != ' ')
-                    {
-                        firstCharFound = true;
-                    }
-                }
-            }
-
+            int solution2Counter = 0;
             using (StreamWriter writer = new StreamWriter("Output2.txt"))
             {
                 for (var lineIndex = 0; lineIndex < inputList.Count; lineIndex++)
                 {
                     for (var charIndex = 0; charIndex < inputList[0].Length; charIndex++)
                     {
-                        writer.Write(inputList[lineIndex][charIndex]);
+                        char charToWrite = inputList[lineIndex][charIndex];
+
+                        if(charToWrite == '.')
+                        {
+                            solution2Counter++;
+                        }
+                        writer.Write(charToWrite);
                     }
                     writer.WriteLine();
                 }
-
             }
+
+            Console.WriteLine($"Solution 2 is {solution2Counter}");
         }
     }
 }
