@@ -68,10 +68,9 @@
                 inputDict.Add(inputs[0], (inputs[1], inputs[2]));
             }
 
-            int solution1Counter = 0;
+            int solution2Counter = 0;
 
             List<string> currentInputs = new List<string>();
-
             foreach (var input in inputDict.Keys)
             {
                 if (input.EndsWith('A'))
@@ -80,27 +79,85 @@
                 }
             }
 
+            int[] offsetts = new int[currentInputs.Count];
+            int[] loopLengths = new int[currentInputs.Count];
+            bool[] firstFinishFound = new bool[currentInputs.Count];
+            bool[] loopLengthFound = new bool[currentInputs.Count];
+
             while (true)
             {
-                var nextStep = instructions[solution1Counter % instructions.Length];
+                var nextStep = instructions[solution2Counter % instructions.Length];
+                solution2Counter++;
+
+                bool isFinished = true;
 
                 for (var inputIndex = 0; inputIndex < currentInputs.Count; inputIndex++)
                 {
-
+                    var currentInput = currentInputs[inputIndex];
                     var nextInputs = inputDict[currentInput];
-
-                    solution1Counter++;
 
                     currentInput = (nextStep == 'L') ? nextInputs.left : nextInputs.right;
 
-                    if (currentInput == "ZZZ")
+                    currentInputs[inputIndex] = currentInput;
+
+                    if (!currentInput.EndsWith('Z'))
                     {
+                        isFinished = false;
+                    }
+                    else
+                    {
+                        if (!firstFinishFound[inputIndex])
+                        {
+                            offsetts[inputIndex] = solution2Counter;
+                            firstFinishFound[inputIndex] = true;
+                        }
+                        else if (!loopLengthFound[inputIndex])
+                        {
+                            loopLengths[inputIndex] = solution2Counter - offsetts[inputIndex];
+                            loopLengthFound[inputIndex] = true;
+                        }
+                    }
+
+                    if (!loopLengthFound.Contains(false))
+                    {
+                        isFinished = true;
                         break;
                     }
                 }
+
+                if (isFinished)
+                {
+                    break;
+                }
             }
 
-            Console.WriteLine($"Solution 1 is reached after {solution1Counter} steps");
+            var loopLengthList = loopLengths.ToList();
+            loopLengthList.Sort();
+
+            int biggestMember = loopLengthList[loopLengthList.Count - 1];
+
+            for (long i = 1; i < 10000000000000; i++)
+            {
+                long potentialSolution = biggestMember * i;
+
+                bool found = true;
+                foreach (var loopLength in loopLengthList)
+                {
+                    if (potentialSolution % loopLength != 0)
+                    {
+                        found = false;
+                        break;
+                    }
+                }
+                if (found)
+                {
+                    Console.WriteLine($"Solution 2 is reached after {potentialSolution} steps");
+                    break;
+                }
+            }
+
+            Console.WriteLine("Did not find solution 2");
+
         }
     }
 }
