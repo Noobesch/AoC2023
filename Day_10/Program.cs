@@ -42,7 +42,7 @@
             int rowLength = inputList.Count;
             int columnLength = inputList[0].Length;
 
-            for (var runThroughs = 0; runThroughs < 5; runThroughs++)
+            for (var runThroughs = 0; runThroughs < 10; runThroughs++)
             {
                 for (var rowIndex = 0; rowIndex < inputList.Count; rowIndex++)
                 {
@@ -130,13 +130,17 @@
                 inputList[lineIndex] = line;
             }
 
-            for (var lineIndex = 0; lineIndex < inputList.Count; lineIndex++)
+            using (StreamWriter writer = new StreamWriter("Outputx.txt"))
             {
-                for (var charIndex = 0; charIndex < inputList[0].Length; charIndex++)
+                for (var lineIndex = 0; lineIndex < inputList.Count; lineIndex++)
                 {
-                    Console.Write(inputList[lineIndex][charIndex]);
+                    for (var charIndex = 0; charIndex < inputList[0].Length; charIndex++)
+                    {
+                        writer.Write(inputList[lineIndex][charIndex]);
+                    }
+                    writer.WriteLine();
                 }
-                Console.WriteLine();
+
             }
 
             Console.WriteLine($"Loop length is {(loopLength + 1) / 2}");
