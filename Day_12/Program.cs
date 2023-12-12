@@ -63,13 +63,13 @@ public class Day12
                 var splitLine = reader.ReadLine().Split(" ");
 
                 string riddle = "";
-                for(var i = 0; i < 5; i++)
+                for (var i = 0; i < 5; i++)
                 {
                     riddle += splitLine[0];
                     riddle += "?";
                 }
 
-                riddle = riddle.Remove(riddle.Length -1, 1);
+                riddle = riddle.Remove(riddle.Length - 1, 1);
                 riddleList.Add(riddle);
 
                 var splitNumbers = splitLine[1].Split(',');
@@ -82,7 +82,7 @@ public class Day12
                 }
 
                 List<int> instruction = new List<int>();
-                for(var i = 0; i < 5; i++)
+                for (var i = 0; i < 5; i++)
                 {
                     instruction.AddRange(lineList);
                 }
@@ -109,10 +109,8 @@ public class Day12
 
     static bool IsValidCombination(string solution, List<int> instructions)
     {
-
         List<int> possibleSolutions = new List<int>();
         possibleSolutions.Add(0);
-        int brokenCounter = 0;
 
         for (var i = 0; i < solution.Length; i++)
         {
@@ -149,8 +147,62 @@ public class Day12
         return true;
     }
 
+    static bool FastCheck(string partSolution, List<int> instructions)
+    {
+        List<int> possibleSolutions = new List<int>();
+        possibleSolutions.Add(0);
+
+        for (var i = 0; i < partSolution.Length; i++)
+        {
+            char character = partSolution[i];
+
+            if (character == '#')
+            {
+                possibleSolutions[possibleSolutions.Count - 1]++;
+            }
+            else
+            {
+                possibleSolutions.Add(0);
+            }
+        }
+
+        possibleSolutions.RemoveAll(x => x == 0);
+
+        if (instructions.Count < possibleSolutions.Count)
+        {
+            return false;
+        }
+
+        for (var i = 0; i < possibleSolutions.Count; i++)
+        {
+            int instruction = instructions[i];
+            int possibleSolution = possibleSolutions[i];
+
+            if (instruction != possibleSolution)
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     static int CalculatePossibilities(string riddle, string partSolution, List<int> instructions)
     {
+        if (partSolution.Length > 0)
+        {
+            char lastChar = partSolution[partSolution.Length - 1];
+
+            if (lastChar == '.')
+            {
+                if (!FastCheck(partSolution, instructions))
+                {
+                    return 0;
+                }
+            }
+
+        }
+
         if (partSolution.Length == riddle.Length)
         {
             bool isValid = IsValidCombination(partSolution, instructions);
