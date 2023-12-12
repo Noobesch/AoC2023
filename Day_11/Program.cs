@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-public class Day10
+public class Day11
 {
     static void Main()
     {
