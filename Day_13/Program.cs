@@ -183,8 +183,8 @@ public class Day13
                     tempCharArray[smudgeColumnIndex] = tempCharArray[smudgeColumnIndex] == '.' ? '#' : '.';
                     tempList[smudgeRowIndex] = new string(tempCharArray);
 
-                    int mirrorIndexLeft = int.MinValue;
-                    int mirrorIndexRight = int.MinValue;
+                    int mirrorIndexLeftUpper = int.MinValue;
+                    int mirrorIndexRightLower = int.MinValue;
 
                     HashSet<string> mirrorSet = new HashSet<string>();
 
@@ -198,20 +198,34 @@ public class Day13
                             continue;
                         }
 
-                        mirrorIndexLeft = index - 1;
-                        mirrorIndexRight = index;
+                        mirrorIndexLeftUpper = index - 1;
+                        mirrorIndexRightLower = index;
 
                         while (true)
                         {
-                            if (mirrorIndexLeft < 0 || mirrorIndexRight >= tempList.Count)
+                            if (mirrorIndexLeftUpper < 0 || mirrorIndexRightLower >= tempList.Count)
                             {
-                                tempSolution = isRow ? 100 * index : index;
+                                //Check row testing
+                                if (isRow)
+                                {
+                                    if (mirrorIndexLeftUpper < smudgeRowIndex && mirrorIndexRightLower > smudgeRowIndex)
+                                    {
+                                        tempSolution = isRow ? 100 * index : index;
+                                    }
+                                }
+                                else
+                                {
+                                    if (mirrorIndexLeftUpper < smudgeRowIndex && mirrorIndexRightLower > smudgeRowIndex)
+                                    {
+                                        tempSolution = isRow ? 100 * index : index;
+                                    }
+                                }
                                 break;
                             }
-                            if (tempList[mirrorIndexLeft] == tempList[mirrorIndexRight])
+                            if (tempList[mirrorIndexLeftUpper] == tempList[mirrorIndexRightLower])
                             {
-                                mirrorIndexLeft--;
-                                mirrorIndexRight++;
+                                mirrorIndexLeftUpper--;
+                                mirrorIndexRightLower++;
                             }
                             else
                             {
