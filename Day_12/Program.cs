@@ -35,14 +35,14 @@ public class Day12
                 instructionList.Add(lineList);
             }
 
-            int solution1 = 0;
+            long solution1 = 0;
 
             for (var lineIndex = 0; lineIndex < riddleList.Count; lineIndex++)
             {
                 string riddleInput = riddleList[lineIndex];
                 List<int> instructionInput = instructionList[lineIndex];
 
-                int lineSolution = CalculatePossibilities(riddleInput, "", instructionInput);
+                long lineSolution = CalculatePossibilities(riddleInput, "", instructionInput);
                 solution1 += lineSolution;
             }
 
@@ -89,20 +89,20 @@ public class Day12
                 instructionList.Add(instruction);
             }
 
-            int solution1 = 0;
+            long solution2 = 0;
 
             for (var lineIndex = 0; lineIndex < riddleList.Count; lineIndex++)
             {
                 string riddleInput = riddleList[lineIndex];
                 List<int> instructionInput = instructionList[lineIndex];
 
-                int lineSolution = CalculatePossibilities(riddleInput, "", instructionInput);
-                solution1 += lineSolution;
+                long lineSolution = CalculatePossibilities(riddleInput, "", instructionInput);
+                solution2 += lineSolution;
 
                 Console.WriteLine($"Solution for line {lineIndex + 1} is {lineSolution}");
             }
 
-            Console.WriteLine($"Solution 1 is {solution1}");
+            Console.WriteLine($"Solution 2 is {solution2}");
 
         }
     }
@@ -187,7 +187,7 @@ public class Day12
         return true;
     }
 
-    static int CalculatePossibilities(string riddle, string partSolution, List<int> instructions)
+    static long CalculatePossibilities(string riddle, string partSolution, List<int> instructions)
     {
         if (partSolution.Length > 0)
         {
@@ -212,7 +212,7 @@ public class Day12
         int startIndex = partSolution.Length;
         char riddleSymbol = riddle[startIndex];
 
-        int validSolutions = 0;
+        long validSolutions = 0;
 
         switch (riddleSymbol)
         {
