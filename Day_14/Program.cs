@@ -6,7 +6,7 @@ public class Day14
     static void Main()
     {
         string path = "Input_1.txt";
-        path = "../../../Input_1.txt";
+        // path = "../../../Input_1.txt";
         Part1(path);
         Part2(path);
     }
@@ -160,9 +160,27 @@ public class Day14
                 }
             }
 
+            tupleList.RemoveRange(0, firstRepetitionIndex - cycleLength);
+
             int remainder = (1000000000 - firstRepetitionIndex) % cycleLength;
             long solution2 = tupleList[remainder].value;
            
+            List<int> solutions = new List<int>();
+            foreach(var tuple in tupleList)
+            {
+                if(!solutions.Contains(tuple.value))
+                {
+                    solutions.Add(tuple.value);
+                }
+            }
+
+            solutions.Sort();
+
+            foreach(var solution in solutions)
+            {
+                Console.WriteLine(solution);
+            }
+
             Console.WriteLine($"Solution 2 is {solution2}");
         }
     }
