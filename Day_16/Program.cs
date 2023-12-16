@@ -10,7 +10,8 @@ public enum Direction
     North,
     East,
     South,
-    West
+    West,
+    None
 }
 
 public class Beam
@@ -27,7 +28,7 @@ public class Beam
     }
     public List<(int row, int column)> path = new List<(int row, int column)>();
     //Set this to your first puzzle direction
-    public Direction Direction = Direction.South;
+    public Direction Direction = Direction.None;
     private (int row, int column) currentPos;
 
     public void SetPosition((int row, int column) newPos)
@@ -79,6 +80,17 @@ public class Day16
 
         litArray = new bool[inputList.Count, inputList[0].Count];
         Beam beam = new Beam();
+
+        char startSymbol = inputList[0][0];
+
+        switch(startSymbol)
+        {
+            case '.': beam.Direction = Direction.East; break;
+            case '\\': beam.Direction = Direction.South; break;
+            case '/': beam.Direction = Direction.North; break;
+            case '-': beam.Direction = Direction.East; break;
+            case '|': beam.Direction = Direction.South; break;
+        }
 
         PathFinder(beam);
 
