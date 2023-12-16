@@ -51,9 +51,9 @@ public class Day16
     static void Main()
     {
         string path = "Input_1.txt";
-        // path = "../../../Input_1.txt";
+        path = "../../../Input_1.txt";
         Part1(path);
-        // Part2(path);
+        Part2(path);
     }
 
     static void Part1(string path)
@@ -83,7 +83,7 @@ public class Day16
 
         char startSymbol = inputList[0][0];
 
-        switch(startSymbol)
+        switch (startSymbol)
         {
             case '.': beam.Direction = Direction.East; break;
             case '\\': beam.Direction = Direction.South; break;
@@ -115,6 +115,113 @@ public class Day16
         }
         Console.WriteLine($"Done, solution 1 is {solution1}");
     }
+
+    static void Part2(string path)
+    {
+        directionList = new List<Direction>[inputList.Count, inputList[0].Count];
+
+        for (var rowIndex = 0; rowIndex < directionList.GetLength(0); rowIndex++)
+        {
+            for (var columnIndex = 0; columnIndex < directionList.GetLength(1); columnIndex++)
+            {
+                directionList[rowIndex, columnIndex] = new List<Direction>();
+            }
+        }
+
+
+        long solution2 = 0;
+        for (var rowIndex = 0; rowIndex < inputList.Count; rowIndex++)
+        {
+            for (var columnIndex = 0; columnIndex < inputList.Count; columnIndex++)
+            {
+                if (rowIndex != 0 && columnIndex != 0)
+                {
+                    continue;
+                }
+            }
+        }
+        Console.WriteLine($"Done, 2 solution is {solution2}");
+
+    }
+
+    static void Startup(int rowIndex, int columnIndex, ref int solution2)
+    {
+
+        litArray = new bool[inputList.Count, inputList[0].Count];
+
+        Beam beam = new Beam();
+        char startSymbol = inputList[rowIndex][columnIndex];
+
+        switch (startSymbol)
+        {
+            case '.': break;
+            case '\\':
+                switch (beam.Direction)
+                {
+                    case Direction.North: beam.Direction = Direction.West; break;
+                    case Direction.East: beam.Direction = Direction.South; break;
+                    case Direction.South: beam.Direction = Direction.East; break;
+                    case Direction.West: beam.Direction = Direction.North; break;
+                }
+                break;
+            case '/':
+                switch (beam.Direction)
+                {
+                    case Direction.North: beam.Direction = Direction.East; break;
+                    case Direction.East: beam.Direction = Direction.North; break;
+                    case Direction.South: beam.Direction = Direction.West; break;
+                    case Direction.West: beam.Direction = Direction.South; break;
+                }
+                break;
+
+            case '-':
+                switch (beam.Direction)
+                {
+                    case Direction.East: break;
+                    case Direction.West: break;
+
+                    case Direction.North:
+                    case Direction.South:
+                        break;
+                }
+                break;
+
+            case '|':
+                switch (beam.Direction)
+                {
+                    case Direction.North: break;
+                    case Direction.South: break;
+
+                    case Direction.East:
+                    case Direction.West:
+                        break;
+                }
+                break;
+        }
+        PathFinder(beam);
+
+
+        int tempSol2 = 0;
+        for (var solRowIndex = 0; solRowIndex < litArray.GetLength(0); solRowIndex++)
+        {
+            for (var solColumnIndex = 0; solColumnIndex < litArray.GetLength(1); solColumnIndex++)
+            {
+                bool isLit = litArray[solRowIndex, solColumnIndex];
+
+                if (isLit)
+                {
+                    tempSol2++;
+                }
+            }
+        }
+        Console.WriteLine($"Temp 2 solution is {tempSol2}");
+
+        if (tempSol2 > solution2)
+        {
+            solution2 = tempSol2;
+        }
+    }
+
     static void PathFinder(Beam beam)
     {
         var currentPos = beam.GetPosition();
@@ -175,7 +282,7 @@ public class Day16
                     case Direction.South:
                         Beam newBeam = new Beam(beam.GetPosition(), beam.path);
                         newBeam.Direction = Direction.West;
-                        
+
                         beam.Direction = Direction.East;
                         PathFinder(beam);
                         PathFinder(newBeam);
