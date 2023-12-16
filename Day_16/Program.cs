@@ -53,7 +53,7 @@ public class Day16
         string path = "Input_1.txt";
         path = "../../../Input_1.txt";
         Part1(path);
-        Part2(path);
+        // Part2(path);
     }
 
     static void Part1(string path)
@@ -130,21 +130,47 @@ public class Day16
 
 
         long solution2 = 0;
-        for (var rowIndex = 0; rowIndex < inputList.Count; rowIndex++)
+        int cycleCount = 0;
+
+        for (var rowIndex = 0; rowIndex < 1; rowIndex++)
         {
             for (var columnIndex = 0; columnIndex < inputList.Count; columnIndex++)
             {
-                if (rowIndex != 0 && columnIndex != 0)
-                {
-                    continue;
-                }
+                cycleCount++;
+                Startup(rowIndex, columnIndex, ref solution2);
             }
         }
-        Console.WriteLine($"Done, 2 solution is {solution2}");
+        for (var rowIndex = inputList.Count - 1; rowIndex > inputList.Count - 2; rowIndex--)
+        {
+            for (var columnIndex = 0; columnIndex < inputList.Count; columnIndex++)
+            {
+                cycleCount++;
+                Startup(rowIndex, columnIndex, ref solution2);
+            }
+        }
+
+
+        for (var columnIndex = 0; columnIndex < 1; columnIndex++)
+        {
+            for (var rowIndex = 0; rowIndex < inputList.Count; rowIndex++)
+            {
+                cycleCount++;
+                Startup(rowIndex, columnIndex, ref solution2);
+            }
+        }
+        for (var columnIndex = inputList.Count - 1; columnIndex > inputList.Count - 2; columnIndex--)
+        {
+            for (var rowIndex = 0; rowIndex < inputList.Count; rowIndex++)
+            {
+                cycleCount++;
+                Startup(rowIndex, columnIndex, ref solution2);
+            }
+        }
+        Console.WriteLine($"Done, 2 solution is {solution2} after {cycleCount} cycles");
 
     }
 
-    static void Startup(int rowIndex, int columnIndex, ref int solution2)
+    static void Startup(int rowIndex, int columnIndex, ref long solution2)
     {
 
         litArray = new bool[inputList.Count, inputList[0].Count];
@@ -201,7 +227,7 @@ public class Day16
         PathFinder(beam);
 
 
-        int tempSol2 = 0;
+        long tempSol2 = 0;
         for (var solRowIndex = 0; solRowIndex < litArray.GetLength(0); solRowIndex++)
         {
             for (var solColumnIndex = 0; solColumnIndex < litArray.GetLength(1); solColumnIndex++)
@@ -222,7 +248,7 @@ public class Day16
         }
     }
 
-    static void PathFinder(Beam beam)
+    static void PathFinder(Beam beam, bool correctPosition = true)
     {
         var currentPos = beam.GetPosition();
         var directions = directionList[currentPos.row, currentPos.column];
@@ -260,8 +286,7 @@ public class Day16
                     case Direction.South: beam.Direction = Direction.East; break;
                     case Direction.West: beam.Direction = Direction.North; break;
                 }
-                PathFinder(beam); break;
-
+                break;
             case '/':
                 switch (beam.Direction)
                 {
@@ -270,13 +295,12 @@ public class Day16
                     case Direction.South: beam.Direction = Direction.West; break;
                     case Direction.West: beam.Direction = Direction.South; break;
                 }
-                PathFinder(beam); break;
-
+                break;
             case '-':
                 switch (beam.Direction)
                 {
-                    case Direction.East: PathFinder(beam); break;
-                    case Direction.West: PathFinder(beam); break;
+                    case Direction.East: break;
+                    case Direction.West: break;
 
                     case Direction.North:
                     case Direction.South:
@@ -284,7 +308,6 @@ public class Day16
                         newBeam.Direction = Direction.West;
 
                         beam.Direction = Direction.East;
-                        PathFinder(beam);
                         PathFinder(newBeam);
                         break;
                 }
@@ -293,8 +316,8 @@ public class Day16
             case '|':
                 switch (beam.Direction)
                 {
-                    case Direction.North: PathFinder(beam); break;
-                    case Direction.South: PathFinder(beam); break;
+                    case Direction.North: break;
+                    case Direction.South: break;
 
                     case Direction.East:
                     case Direction.West:
@@ -302,12 +325,12 @@ public class Day16
                         newBeam.Direction = Direction.South;
 
                         beam.Direction = Direction.North;
-                        PathFinder(beam);
                         PathFinder(newBeam);
                         break;
                 }
                 break;
         }
+        PathFinder(beam);
     }
 
     static bool FindNextStep(Beam beam, out (int row, int column) newPos)
