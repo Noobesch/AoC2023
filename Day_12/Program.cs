@@ -2,12 +2,13 @@
 
 public class Day12
 {
+    static List<List<string>> pseudoValidLines = new List<List<string>>();
     static void Main()
     {
         string path = "Input_1.txt";
-        // path = "../../../Input_1.txt";
+        path = "../../../Input_1.txt";
         Part1(path);
-        Part2(path);
+        // Part2(path);
     }
 
     static void Part1(string path)
@@ -42,9 +43,13 @@ public class Day12
                 string riddleInput = riddleList[lineIndex];
                 List<int> instructionInput = instructionList[lineIndex];
 
-                long lineSolution = CalculatePossibilities(riddleInput, "", instructionInput);
+                pseudoValidLines.Add(new List<string>());
+
+                long lineSolution = CalculatePossibilities(riddleInput, "", instructionInput, lineIndex);
                 solution1 += lineSolution;
             }
+
+            int pseudoLinesCount = pseudoValidLines.Sum(x => x.Count);
 
             Console.WriteLine($"Solution 1 is {solution1}");
 
@@ -96,7 +101,7 @@ public class Day12
                 string riddleInput = riddleList[lineIndex];
                 List<int> instructionInput = instructionList[lineIndex];
 
-                long lineSolution = CalculatePossibilities(riddleInput, "", instructionInput);
+                long lineSolution = CalculatePossibilities(riddleInput, "", instructionInput, lineIndex);
                 solution2 += lineSolution;
 
                 Console.WriteLine($"Solution for line {lineIndex + 1} is {lineSolution}");
@@ -107,7 +112,7 @@ public class Day12
         }
     }
 
-    static bool IsValidCombination(string solution, List<int> instructions)
+    static bool IsValidCombination(string solution, List<int> instructions, int lineIndex)
     {
         List<int> possibleSolutions = new List<int>();
         possibleSolutions.Add(0);
@@ -140,10 +145,14 @@ public class Day12
 
             if (instruction != possibleSolution)
             {
+                if (possibleSolution < instruction)
+                {
+                    pseudoValidLines[lineIndex].Add(solution);
+                }
                 return false;
             }
         }
-
+        pseudoValidLines[lineIndex].Add(solution);
         return true;
     }
 
@@ -187,7 +196,7 @@ public class Day12
         return true;
     }
 
-    static long CalculatePossibilities(string riddle, string partSolution, List<int> instructions)
+    static long CalculatePossibilities(string riddle, string partSolution, List<int> instructions, int lineIndex)
     {
         if (partSolution.Length > 0)
         {
@@ -205,7 +214,7 @@ public class Day12
 
         if (partSolution.Length == riddle.Length)
         {
-            bool isValid = IsValidCombination(partSolution, instructions);
+            bool isValid = IsValidCombination(partSolution, instructions, lineIndex);
             return isValid ? 1 : 0;
         }
 
@@ -218,16 +227,16 @@ public class Day12
         {
             case '?':
                 //Damaged path
-                validSolutions += CalculatePossibilities(riddle, partSolution + "#", instructions);
+                validSolutions += CalculatePossibilities(riddle, partSolution + "#", instructions, lineIndex);
                 //Working path
-                validSolutions += CalculatePossibilities(riddle, partSolution + ".", instructions);
+                validSolutions += CalculatePossibilities(riddle, partSolution + ".", instructions, lineIndex);
                 break;
 
             case '#':
-                validSolutions += CalculatePossibilities(riddle, partSolution + "#", instructions);
+                validSolutions += CalculatePossibilities(riddle, partSolution + "#", instructions, lineIndex);
                 break;
             case '.':
-                validSolutions += CalculatePossibilities(riddle, partSolution + ".", instructions);
+                validSolutions += CalculatePossibilities(riddle, partSolution + ".", instructions, lineIndex);
                 break;
         }
 
