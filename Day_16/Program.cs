@@ -46,14 +46,14 @@ public class Beam
 public class Day16
 {
     static List<List<char>> inputList = new List<List<char>>();
-    static bool[,] litArray;
-    static List<Direction>[,] directionList;
+    // static bool[,] litArray;
+    // static List<Direction>[,] directionList;
     static void Main()
     {
         string path = "Input_1.txt";
-        path = "../../../Input_1.txt";
+        // path = "../../../Input_1.txt";
         Part1(path);
-        // Part2(path);
+        Part2(path);
     }
 
     static void Part1(string path)
@@ -68,7 +68,7 @@ public class Day16
             }
         }
 
-        directionList = new List<Direction>[inputList.Count, inputList[0].Count];
+        List<Direction>[,] directionList; directionList = new List<Direction>[inputList.Count, inputList[0].Count];
 
         for (var rowIndex = 0; rowIndex < directionList.GetLength(0); rowIndex++)
         {
@@ -78,7 +78,7 @@ public class Day16
             }
         }
 
-        litArray = new bool[inputList.Count, inputList[0].Count];
+        bool[,] litArray = new bool[inputList.Count, inputList[0].Count];
         Beam beam = new Beam();
 
         char startSymbol = inputList[0][0];
@@ -92,7 +92,7 @@ public class Day16
             case '|': beam.Direction = Direction.South; break;
         }
 
-        PathFinder(beam);
+        PathFinder(beam, directionList, litArray);
 
         long solution1 = 0;
 
@@ -118,26 +118,17 @@ public class Day16
 
     static void Part2(string path)
     {
-        directionList = new List<Direction>[inputList.Count, inputList[0].Count];
-
-        for (var rowIndex = 0; rowIndex < directionList.GetLength(0); rowIndex++)
-        {
-            for (var columnIndex = 0; columnIndex < directionList.GetLength(1); columnIndex++)
-            {
-                directionList[rowIndex, columnIndex] = new List<Direction>();
-            }
-        }
-
-
         long solution2 = 0;
         int cycleCount = 0;
+
 
         for (var rowIndex = 0; rowIndex < 1; rowIndex++)
         {
             for (var columnIndex = 0; columnIndex < inputList.Count; columnIndex++)
             {
+                char symbol = inputList[rowIndex][columnIndex];
                 cycleCount++;
-                Startup(rowIndex, columnIndex, ref solution2);
+                Startup(rowIndex, columnIndex, ref solution2, Direction.South);
             }
         }
         for (var rowIndex = inputList.Count - 1; rowIndex > inputList.Count - 2; rowIndex--)
@@ -145,7 +136,9 @@ public class Day16
             for (var columnIndex = 0; columnIndex < inputList.Count; columnIndex++)
             {
                 cycleCount++;
-                Startup(rowIndex, columnIndex, ref solution2);
+                Startup(rowIndex, columnIndex, ref solution2, Direction.North);
+
+
             }
         }
 
@@ -155,7 +148,9 @@ public class Day16
             for (var rowIndex = 0; rowIndex < inputList.Count; rowIndex++)
             {
                 cycleCount++;
-                Startup(rowIndex, columnIndex, ref solution2);
+                Startup(rowIndex, columnIndex, ref solution2, Direction.East);
+
+
             }
         }
         for (var columnIndex = inputList.Count - 1; columnIndex > inputList.Count - 2; columnIndex--)
@@ -163,68 +158,33 @@ public class Day16
             for (var rowIndex = 0; rowIndex < inputList.Count; rowIndex++)
             {
                 cycleCount++;
-                Startup(rowIndex, columnIndex, ref solution2);
+                Startup(rowIndex, columnIndex, ref solution2, Direction.West);
+
+
             }
         }
         Console.WriteLine($"Done, 2 solution is {solution2} after {cycleCount} cycles");
 
     }
 
-    static void Startup(int rowIndex, int columnIndex, ref long solution2)
+    static void Startup(int rowIndex, int columnIndex, ref long solution2, Direction direction)
     {
+        bool[,] litArray = new bool[inputList.Count, inputList[0].Count];
 
-        litArray = new bool[inputList.Count, inputList[0].Count];
+        List<Direction>[,] directionList = new List<Direction>[inputList.Count, inputList[0].Count];
 
-        Beam beam = new Beam();
-        char startSymbol = inputList[rowIndex][columnIndex];
-
-        switch (startSymbol)
+        for (var directionRow = 0; directionRow < directionList.GetLength(0); directionRow++)
         {
-            case '.': break;
-            case '\\':
-                switch (beam.Direction)
-                {
-                    case Direction.North: beam.Direction = Direction.West; break;
-                    case Direction.East: beam.Direction = Direction.South; break;
-                    case Direction.South: beam.Direction = Direction.East; break;
-                    case Direction.West: beam.Direction = Direction.North; break;
-                }
-                break;
-            case '/':
-                switch (beam.Direction)
-                {
-                    case Direction.North: beam.Direction = Direction.East; break;
-                    case Direction.East: beam.Direction = Direction.North; break;
-                    case Direction.South: beam.Direction = Direction.West; break;
-                    case Direction.West: beam.Direction = Direction.South; break;
-                }
-                break;
-
-            case '-':
-                switch (beam.Direction)
-                {
-                    case Direction.East: break;
-                    case Direction.West: break;
-
-                    case Direction.North:
-                    case Direction.South:
-                        break;
-                }
-                break;
-
-            case '|':
-                switch (beam.Direction)
-                {
-                    case Direction.North: break;
-                    case Direction.South: break;
-
-                    case Direction.East:
-                    case Direction.West:
-                        break;
-                }
-                break;
+            for (var directionColumn = 0; directionColumn < directionList.GetLength(1); directionColumn++)
+            {
+                directionList[directionRow, directionColumn] = new List<Direction>();
+            }
         }
-        PathFinder(beam);
+
+        Beam beam = new Beam((rowIndex, columnIndex), new List<(int row, int column)>());
+        beam.Direction = direction;
+
+        PathFinder(beam, directionList, litArray);
 
 
         long tempSol2 = 0;
@@ -233,22 +193,19 @@ public class Day16
             for (var solColumnIndex = 0; solColumnIndex < litArray.GetLength(1); solColumnIndex++)
             {
                 bool isLit = litArray[solRowIndex, solColumnIndex];
-
                 if (isLit)
                 {
                     tempSol2++;
                 }
             }
         }
-        Console.WriteLine($"Temp 2 solution is {tempSol2}");
-
         if (tempSol2 > solution2)
         {
             solution2 = tempSol2;
         }
     }
 
-    static void PathFinder(Beam beam, bool correctPosition = true)
+    static void PathFinder(Beam beam, List<Direction>[,] directionList, bool[,] litArray)
     {
         var currentPos = beam.GetPosition();
         var directions = directionList[currentPos.row, currentPos.column];
@@ -277,7 +234,7 @@ public class Day16
 
         switch (symbol)
         {
-            case '.': PathFinder(beam); break;
+            case '.': break;
             case '\\':
                 switch (beam.Direction)
                 {
@@ -306,9 +263,28 @@ public class Day16
                     case Direction.South:
                         Beam newBeam = new Beam(beam.GetPosition(), beam.path);
                         newBeam.Direction = Direction.West;
-
                         beam.Direction = Direction.East;
-                        PathFinder(newBeam);
+                        // List<Direction>[,] newDirectionList = new List<Direction>[inputList.Count, inputList[0].Count];
+
+                        // for (var directionRow = 0; directionRow < directionList.GetLength(0); directionRow++)
+                        // {
+                        //     for (var directionColumn = 0; directionColumn < directionList.GetLength(1); directionColumn++)
+                        //     {
+                        //         directionList[directionRow, directionColumn] = directionList[directionRow, directionColumn];
+                        //     }
+                        // }
+
+                        // bool[,] newLitArray = new bool[inputList.Count, inputList[0].Count];
+
+                        // for (var litRow = 0; litRow < newLitArray.GetLength(0); litRow++)
+                        // {
+                        //     for (var litColumn = 0; litColumn < newLitArray.GetLength(1); litColumn++)
+                        //     {
+                        //         newLitArray[litRow, litColumn] = litArray[litRow, litColumn];
+                        //     }
+                        // }
+
+                        PathFinder(newBeam, directionList, litArray);
                         break;
                 }
                 break;
@@ -325,12 +301,33 @@ public class Day16
                         newBeam.Direction = Direction.South;
 
                         beam.Direction = Direction.North;
-                        PathFinder(newBeam);
+
+                        // List<Direction>[,] newDirectionList = new List<Direction>[inputList.Count, inputList[0].Count];
+
+                        // for (var directionRow = 0; directionRow < directionList.GetLength(0); directionRow++)
+                        // {
+                        //     for (var directionColumn = 0; directionColumn < directionList.GetLength(1); directionColumn++)
+                        //     {
+                        //         directionList[directionRow, directionColumn] = directionList[directionRow, directionColumn];
+                        //     }
+                        // }
+
+                        // bool[,] newLitArray = new bool[inputList.Count, inputList[0].Count];
+
+                        // for (var litRow = 0; litRow < newLitArray.GetLength(0); litRow++)
+                        // {
+                        //     for (var litColumn = 0; litColumn < newLitArray.GetLength(1); litColumn++)
+                        //     {
+                        //         newLitArray[litRow, litColumn] = litArray[litRow, litColumn];
+                        //     }
+                        // }
+
+                        PathFinder(newBeam, directionList, litArray);
                         break;
                 }
                 break;
         }
-        PathFinder(beam);
+        PathFinder(beam, directionList, litArray);
     }
 
     static bool FindNextStep(Beam beam, out (int row, int column) newPos)
